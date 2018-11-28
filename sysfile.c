@@ -52,6 +52,28 @@ fdalloc(struct file *f)
   return -1;
 }
 
+// [New]
+// Check file mode(user and group).
+static int
+chkMode(short uid, short gid, uint mode, char rwx) 
+{
+  struct proc *curproc = myproc();
+  int mask = ((uid == curproc->uid && rwx == 'r') << 8)
+            + ((uid == curproc->uid && rwx == 'w') << 7)
+            + ((uid == curproc->uid && rwx == 'x') << 6)
+            + ((gid == curproc->gid && rwx == 'r') << 5)
+            + ((gid == curproc->gid && rwx == 'w') << 4)
+            + ((gid == curproc->gid && rwx == 'x') << 3)
+            + ((rwx == 'r') << 2)
+            + ((rwx == 'w') << 1)
+            + ((rwx == 'x'));
+  //cprintf("[DEBUG] %d AND %d\n", mask, mode);    
+  if (mask & mode) {
+    return 1;
+  }
+  return 0;
+}
+
 int
 sys_dup(void)
 {
@@ -75,6 +97,11 @@ sys_read(void)
 
   if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
     return -1;
+  // [New]
+  if(!chkMode(f->ip->uid, f->ip->gid, f->ip->mode, 'r')) {
+    cprintf("permission denied.\n");
+    return -1;
+  }
   return fileread(f, p, n);
 }
 
@@ -87,6 +114,11 @@ sys_write(void)
 
   if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
     return -1;
+  // [New]
+  if(!chkMode(f->ip->uid, f->ip->gid, f->ip->mode, 'w')) {
+    cprintf("permission denied.\n");
+    return -1;
+  }
   return filewrite(f, p, n);
 }
 
@@ -265,6 +297,11 @@ create(char *path, short type, short major, short minor)
   ip->major = major;
   ip->minor = minor;
   ip->nlink = 1;
+  // [New]
+  struct proc* curproc = myproc();
+  ip->uid = curproc->uid;
+  ip->gid = curproc->gid;
+  ip->mode = 504; // rwxrwx---(111111000)
   iupdate(ip);
 
   if(type == T_DIR){  // Create . and .. entries.
@@ -307,6 +344,22 @@ sys_open(void)
       end_op();
       return -1;
     }
+    // [New]
+    // if (omode == O_RDONLY || omode == O_RDWR) {
+    //     if(!chkMode(ip->uid, ip->gid, ip->mode, 'r')) {
+    //       end_op();
+    //       cprintf("permission denied.");
+    //       return -1;
+    //     }
+    // }
+    // if (omode == O_WRONLY || omode == O_RDWR) {
+    //     if(!chkMode(ip->uid, ip->gid, ip->mode, 'w')) {
+    //       end_op();
+    //       cprintf("permission denied.");
+    //       return -1;
+    //     }
+    // }
+    
     ilock(ip);
     if(ip->type == T_DIR && omode != O_RDONLY){
       iunlockput(ip);
@@ -441,5 +494,75 @@ sys_pipe(void)
   }
   fd[0] = fd0;
   fd[1] = fd1;
+  return 0;
+}
+
+// [New] System calls.
+int
+sys_chown(void)
+{
+  cprintf("[SYSCALL] sys_chown\n");
+  char *path;
+  int uid;
+  struct inode *ip;
+  if (argstr(0, &path) < 0 || argint(1, &uid)) {
+    return -1;
+  }
+  begin_op();
+  if ((ip = namei(path)) == 0) {
+      end_op();
+      return -1;
+  }
+  ilock(ip);
+  ip->uid = uid;
+  iupdate(ip);
+  iunlockput(ip);
+  end_op();
+  return 0;
+}
+
+int
+sys_chgrp(void)
+{
+  cprintf("[SYSCALL] sys_chgrp\n");
+  char *path;
+  int gid;
+  struct inode *ip;
+  if (argstr(0, &path) < 0 || argint(1, &gid) < 0) {
+    return -1;
+  }
+  begin_op();
+  if ((ip = namei(path)) == 0) {
+      end_op();
+      return -1;
+  }
+  ilock(ip);
+  ip->gid = gid;
+  iupdate(ip);
+  iunlockput(ip);
+  end_op();
+  return 0;
+}
+
+int
+sys_chmod(void)
+{
+  cprintf("[SYSCALL] sys_chmod\n");
+  char *path;
+  int mode;
+  struct inode *ip;
+  if (argstr(0, &path) < 0 || argint(1, &mode) < 0) {
+    return -1;
+  }
+  begin_op();
+  if ((ip = namei(path)) == 0) {
+      end_op();
+      return -1;
+  }
+  ilock(ip);
+  ip->mode = mode;
+  iupdate(ip);
+  iunlockput(ip);
+  end_op();
   return 0;
 }

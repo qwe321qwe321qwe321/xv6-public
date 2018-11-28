@@ -230,6 +230,11 @@ ialloc(ushort type)
   din.type = xshort(type);
   din.nlink = xshort(1);
   din.size = xint(0);
+  // [New] Set default
+  din.uid = xshort(0); // Root
+  din.gid = xshort(0); // Root
+  din.mode = xint(504); // rwxrwx---(111111000)
+
   winode(inum, &din);
   return inum;
 }

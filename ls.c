@@ -22,6 +22,24 @@ fmtname(char *path)
   return buf;
 }
 
+// [New]
+char*
+fmtfilemode(int mode)
+{
+  static char buf[9];
+  char rwx[] = {'r', 'w', 'x'};
+  int i;
+  for (i = 0; i < 9; ++i) {
+    if (mode & 256){ // mode & bin(100 000 000)
+      buf[i] = rwx[i % 3];
+    } else {
+      buf[i] = '-';
+    }
+    mode <<= 1;
+  }
+  return buf;
+}
+
 void
 ls(char *path)
 {
@@ -43,7 +61,10 @@ ls(char *path)
 
   switch(st.type){
   case T_FILE:
-    printf(1, "%s %d %d %d\n", fmtname(path), st.type, st.ino, st.size);
+    //printf(1, "%s %d %d %d\n", fmtname(path), st.type, st.ino, st.size);
+    // [New] Show file uid, gid, modelsc
+    printf(1, "FILENAME\tTYPE\tINO\tSIZE\tUID\tGID\tMODE\n");
+    printf(1, "%s \t%d\t%d\t%d\t%d\t%d\t%s(%d)\n", fmtname(path), st.type, st.ino, st.size, st.uid, st.gid, fmtfilemode(st.mode), st.mode);
     break;
 
   case T_DIR:
@@ -54,16 +75,20 @@ ls(char *path)
     strcpy(buf, path);
     p = buf+strlen(buf);
     *p++ = '/';
-    while(read(fd, &de, sizeof(de)) == sizeof(de)){
+    // [New] Show file uid, gid, modelsc
+      printf(1, "FILENAME\tTYPE\tINO\tSIZE\tUID\tGID\tMODE\n");
+    while(read(fd, &de, sizeof(de)) == sizeof(de)) {
       if(de.inum == 0)
         continue;
       memmove(p, de.name, DIRSIZ);
       p[DIRSIZ] = 0;
-      if(stat(buf, &st) < 0){
+      if(stat(buf, &st) < 0) {
         printf(1, "ls: cannot stat %s\n", buf);
         continue;
       }
-      printf(1, "%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+      //printf(1, "%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+      // [New] Show file uid, gid, modelsc
+      printf(1, "%s \t%d\t%d\t%d\t%d\t%d\t%s(%d)\n", fmtname(buf), st.type, st.ino, st.size, st.uid, st.gid, fmtfilemode(st.mode), st.mode);
     }
     break;
   }
