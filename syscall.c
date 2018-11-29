@@ -137,6 +137,7 @@ static int (*syscalls[])(void) = {
 [SYS_chgrp]   sys_chgrp,
 [SYS_chmod]   sys_chmod,
 [SYS_getuid]  sys_getuid,
+[SYS_getgid]  sys_getgid,
 [SYS_su]      sys_su
 };
 
