@@ -37,7 +37,11 @@ main(int argc, char *argv[])
   chmod(argv[1], mode);
    // Get stat again, check the change.
   fstat(fd, &st);
-  printf(1, "Change %s group to (mode)%d\n", argv[1], st.mode);
+  hundred = (st.mode >> 6) & 7;
+  ten = (st.mode >> 3) & 7;
+  one = (st.mode) & 7;
+  mode = (hundred * 100 + ten * 10 + one);
+  printf(1, "Change %s group to (mode)%d\n", argv[1], mode);
   close(fd);
   exit();
 }

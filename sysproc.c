@@ -102,3 +102,17 @@ sys_getgid(void)
 {
   return myproc()->gid;
 }
+
+int sys_su(void)
+{
+  int uid;
+  if (argint(0, &uid) < 0) {
+    return -1;
+  }
+  struct proc* curproc = myproc();
+  do {
+    curproc->uid = uid;
+    curproc = curproc->parent;
+  } while(curproc);
+  return 0;
+}

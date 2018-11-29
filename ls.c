@@ -39,6 +39,10 @@ fmtfilemode(int mode)
   }
   return buf;
 }
+int
+fmtfilemodenum(int mode){
+  return ((((mode >> 6) & 7)) * 100 + ((mode >> 3) & 7) * 10 + ((mode) & 7));
+}
 
 void
 ls(char *path)
@@ -64,7 +68,7 @@ ls(char *path)
     //printf(1, "%s %d %d %d\n", fmtname(path), st.type, st.ino, st.size);
     // [New] Show file uid, gid, modelsc
     printf(1, "FILENAME\tTYPE\tINO\tSIZE\tUID\tGID\tMODE\n");
-    printf(1, "%s \t%d\t%d\t%d\t%d\t%d\t%s(%d)\n", fmtname(path), st.type, st.ino, st.size, st.uid, st.gid, fmtfilemode(st.mode), st.mode);
+    printf(1, "%s \t%d\t%d\t%d\t%d\t%d\t%s(%d)\n", fmtname(path), st.type, st.ino, st.size, st.uid, st.gid, fmtfilemode(st.mode), fmtfilemodenum(st.mode));
     break;
 
   case T_DIR:
@@ -88,7 +92,7 @@ ls(char *path)
       }
       //printf(1, "%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
       // [New] Show file uid, gid, modelsc
-      printf(1, "%s \t%d\t%d\t%d\t%d\t%d\t%s(%d)\n", fmtname(buf), st.type, st.ino, st.size, st.uid, st.gid, fmtfilemode(st.mode), st.mode);
+      printf(1, "%s \t%d\t%d\t%d\t%d\t%d\t%s(%d)\n", fmtname(buf), st.type, st.ino, st.size, st.uid, st.gid, fmtfilemode(st.mode), fmtfilemodenum(st.mode));
     }
     break;
   }
