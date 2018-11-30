@@ -26,7 +26,17 @@ exec(char *path, char **argv)
     cprintf("exec: fail\n");
     return -1;
   }
+
   ilock(ip);
+
+   // [New] Execute permission.
+  if(!chkModebyinode(ip, 'x')) {
+    iunlockput(ip);
+    end_op();
+    cprintf("permission denied.\n");
+    return -1;
+  }
+  
   pgdir = 0;
 
   // Check ELF header

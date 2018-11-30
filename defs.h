@@ -156,6 +156,11 @@ int             fetchint(uint, int*);
 int             fetchstr(uint, char**);
 void            syscall(void);
 
+// [New]
+// sysfile.c
+int             chkMode(short uid, short gid, uint mode, const char rwx);
+int             chkModebyinode(struct inode *ip, const char rwx);
+
 // timer.c
 void            timerinit(void);
 

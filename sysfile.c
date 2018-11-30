@@ -54,10 +54,13 @@ fdalloc(struct file *f)
 
 // [New]
 // Check file mode(user and group).
-static int
-chkMode(short uid, short gid, uint mode, char rwx) 
+int
+chkMode(short uid, short gid, uint mode, const char rwx) 
 {
   struct proc *curproc = myproc();
+  if (curproc->uid == 0) { // ROOT has super permission.
+    return 1;
+  }
   int mask = ((uid == curproc->uid && rwx == 'r') << 8)
             + ((uid == curproc->uid && rwx == 'w') << 7)
             + ((uid == curproc->uid && rwx == 'x') << 6)
@@ -72,6 +75,12 @@ chkMode(short uid, short gid, uint mode, char rwx)
     return 1;
   }
   return 0;
+}
+// warpper.
+int
+chkModebyinode(struct inode *ip, const char rwx)
+{
+  return chkMode(ip->uid, ip->gid, ip->mode, rwx);
 }
 
 int
@@ -470,6 +479,7 @@ sys_exec(void)
     if(fetchstr(uarg, &argv[i]) < 0)
       return -1;
   }
+
   return exec(path, argv);
 }
 
