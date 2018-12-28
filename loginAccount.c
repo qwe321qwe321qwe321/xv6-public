@@ -121,7 +121,7 @@ main(void)
   }
   // Success enter system.
   LOGIN_SUCCESS: 
-    printf(1, "Login successed.\n");
+    printf(1, "Login succeed.\n");
   // Execute shell.
   exec("sh", argv);
   exit();
