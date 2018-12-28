@@ -310,7 +310,7 @@ create(char *path, short type, short major, short minor)
   struct proc* curproc = myproc();
   ip->uid = curproc->uid;
   ip->gid = curproc->gid;
-  ip->mode = 504; // rwxrwx---(111111000)
+  ip->mode = 511; // rwxrwxrwx(111111111)
   iupdate(ip);
 
   if(type == T_DIR){  // Create . and .. entries.

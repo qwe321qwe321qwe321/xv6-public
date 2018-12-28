@@ -28,7 +28,7 @@ int chgrp(const char*, int);
 int chmod(const char*, int);
 int getuid(void);
 int getgid(void);
-int su(int);
+int su(int, int);
 
 
 // ulib.c

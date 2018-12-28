@@ -113,7 +113,7 @@ main(void)
     for (i = 0; i < userCount; i += 1) {
       if (strcmp(infos[i].username, txtBuf) == 0) {
         if (strcmp(infos[i].password, txtBuf + 33) == 0) {
-          su(i);
+          su(infos[i].uid, infos[i].gid);
           printf(1, "Login %s...\nuid: %d gid: %d\n", infos[i].username, infos[i].uid, infos[i].gid);
           goto LOGIN_SUCCESS; // 懶得再開變數，直接用GOTO省空間
         }
