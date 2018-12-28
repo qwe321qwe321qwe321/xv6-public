@@ -187,10 +187,11 @@ UPROGS=\
 	_getuid\
 	_getgid\
 	_su\
-        _loginAccount\
+    _loginAccount\
 
 ADDITIONFILES=\
-	NEWFILE
+	NEWFILE\
+	USERS
 
 fs.img: mkfs README $(ADDITIONFILES) $(UPROGS)
 	./mkfs fs.img README $(ADDITIONFILES) $(UPROGS)
