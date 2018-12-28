@@ -188,6 +188,7 @@ UPROGS=\
 	_getgid\
 	_su\
     _loginAccount\
+	_cu\
 
 ADDITIONFILES=\
 	NEWFILE\

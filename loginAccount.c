@@ -56,6 +56,9 @@ int splitUserList(char* txtBuf, AccountInfo* infos) {
   lineCount = split(txtBuf, '\n', lines); // 切開資料行
 
   for(i = 0; i < lineCount; i += 1) {
+    memset(elements[0], 0, 32);
+    memset(elements[1], 0, 32);
+    memset(elements[2], 0, 32);
     // 每行字串以空白分隔成3項資料，分別是Username Password GroupID
     split(lines[i], ' ', elements);
     infos[i].uid = i;
@@ -111,6 +114,7 @@ main(void)
           goto LOGIN_SUCCESS; // 懶得再開變數，直接用GOTO省空間
         }
         printf(1, "Error Password.\n");
+        //printf(1, "txtBuf: %sEND\npassword: %sEND\n", txtBuf, infos[i].password);
         goto ERROR_PASSWD; // 懶得再開變數，直接用GOTO省空間
       }
       //printf(1, "txtBuf: %s\nuserID: %s\n", txtBuf, infos[i].username);
