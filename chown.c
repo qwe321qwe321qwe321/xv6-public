@@ -29,7 +29,10 @@ main(int argc, char *argv[])
     exit();
   }
   // Call chown system call.
-  chown(argv[1], uid);
+  if(chown(argv[1], uid) < 0) {
+    close(fd);
+    exit();
+  }
   // Get stat again, check the change.
   fstat(fd, &st);
   printf(1, "Change %s owner to (uid)%d\n", argv[1], st.uid);

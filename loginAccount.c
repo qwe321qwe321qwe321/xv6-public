@@ -3,6 +3,7 @@
 #include "user.h"
 #include "fcntl.h"
 
+// 使用者輸入
 int
 getInput(char *buf, int nbuf)
 {
@@ -10,10 +11,13 @@ getInput(char *buf, int nbuf)
   gets(buf, nbuf);
   if(buf[0] == 0) // EOF
     return -1;
+  // 
+  // 這裡可以加特殊字元限制
+  //
   buf[strlen(buf) - 1] = '\0'; // 刪除換行符
   return 0;
 }
-
+// Account struct.
 typedef struct accountInfo {
   int uid;
   int gid;
@@ -119,7 +123,7 @@ main(void)
       }
       //printf(1, "txtBuf: %s\nuserID: %s\n", txtBuf, infos[i].username);
     }
-    printf(1, "User not found.\n");
+    printf(1, "User %s is not found.\n", txtBuf);
     ERROR_PASSWD:
       printf(1, "Retry.\n");
   }

@@ -29,7 +29,10 @@ main(int argc, char *argv[])
     exit();
   }
   // Call chgrp system call.
-  chgrp(argv[1], gid);
+  if(chgrp(argv[1], gid) < 0) {
+    close(fd);
+    exit();
+  }
    // Get stat again, check the change.
   fstat(fd, &st);
   printf(1, "Change %s group to (gid)%d\n", argv[1], st.gid);

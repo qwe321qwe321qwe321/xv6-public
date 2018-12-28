@@ -353,21 +353,6 @@ sys_open(void)
       end_op();
       return -1;
     }
-    // [New]
-    // if (omode == O_RDONLY || omode == O_RDWR) {
-    //     if(!chkMode(ip->uid, ip->gid, ip->mode, 'r')) {
-    //       end_op();
-    //       cprintf("permission denied.");
-    //       return -1;
-    //     }
-    // }
-    // if (omode == O_WRONLY || omode == O_RDWR) {
-    //     if(!chkMode(ip->uid, ip->gid, ip->mode, 'w')) {
-    //       end_op();
-    //       cprintf("permission denied.");
-    //       return -1;
-    //     }
-    // }
     
     ilock(ip);
     if(ip->type == T_DIR && omode != O_RDONLY){
@@ -523,6 +508,12 @@ sys_chown(void)
       end_op();
       return -1;
   }
+  // [New]
+  if(!chkMode(ip->uid, ip->gid, ip->mode, 'w')) {
+    end_op();
+    cprintf("permission denied.\n");
+    return -1;
+  }
   ilock(ip);
   ip->uid = uid;
   iupdate(ip);
@@ -546,6 +537,12 @@ sys_chgrp(void)
       end_op();
       return -1;
   }
+  // [New]
+  if(!chkMode(ip->uid, ip->gid, ip->mode, 'w')) {
+    end_op();
+    cprintf("permission denied.\n");
+    return -1;
+  }
   ilock(ip);
   ip->gid = gid;
   iupdate(ip);
@@ -568,6 +565,12 @@ sys_chmod(void)
   if ((ip = namei(path)) == 0) {
       end_op();
       return -1;
+  }
+  // [New]
+  if(!chkMode(ip->uid, ip->gid, ip->mode, 'w')) {
+    end_op();
+    cprintf("permission denied.\n");
+    return -1;
   }
   ilock(ip);
   ip->mode = mode;

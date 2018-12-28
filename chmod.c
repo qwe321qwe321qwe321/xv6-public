@@ -34,7 +34,10 @@ main(int argc, char *argv[])
   // transform to binary.
   mode = (hundred << 6) + (ten << 3) + one;
   // Call chown system call.
-  chmod(argv[1], mode);
+  if(chmod(argv[1], mode) < 0) { // Permisson.
+    close(fd);
+    exit();
+  }
    // Get stat again, check the change.
   fstat(fd, &st);
   hundred = (st.mode >> 6) & 7;
